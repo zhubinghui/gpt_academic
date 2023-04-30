@@ -14,6 +14,10 @@ RUN pip3 install -r requirements.txt
 
 COPY . .
 
+#需要使用sqlite进行用户认证，增加如下两行内容，注意文件需要和Dockerfile在一个目录下
+RUN apt-get update && apt-get install -y sqlite3
+COPY academic_chat.db ./gpt/academic_chat.db
+
 # 可选步骤，用于预热模块
 RUN python3  -c 'from check_proxy import warm_up_modules; warm_up_modules()'
 
