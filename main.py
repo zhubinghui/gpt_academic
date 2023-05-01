@@ -197,18 +197,28 @@ def main():
     import sqlite3
 
     def authenticate_user(username, password):
-        conn = sqlite3.connect("academic_chat.db")
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-        SELECT * FROM users
-        WHERE username = ? AND password = ? AND datetime(expires_at, 'unixepoch') > datetime('now');
-        """, (username, password))
-        
-        result = cursor.fetchone()
-        conn.close()
-        
-        return result is not None
+        try:
+            conn = sqlite3.connect("./gpt/academic_chat.db")
+            cursor = conn.cursor()
+
+            cursor.execute("""
+            SELECT * FROM users
+            WHERE username = ? AND password = ? AND datetime(expires_at, 'unixepoch') > datetime('now');
+            """, (username, password))
+
+            result = cursor.fetchone()
+            conn.close()
+            
+            if result is not None:
+                print("Connection successful and user authenticated.")
+                return True
+            else:
+                print("Connection successful, but user not authenticated.")
+                return False
+
+        except sqlite3.Error as e:
+            print(f"Error connecting to the database: {e}")
+            return False
 
     auto_opentab_delay()
     demo.queue(concurrency_count=CONCURRENT_COUNT).launch(server_name="0.0.0.0", server_port=PORT, auth=AUTHENTICATION, favicon_path="docs/logo.png")
